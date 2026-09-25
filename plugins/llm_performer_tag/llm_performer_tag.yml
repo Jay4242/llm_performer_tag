@@ -1,0 +1,79 @@
+name: LLMPerformerTag
+description: Tags scenes and images with performers using a vision LLM. Matches against existing performers and suggests new ones.
+version: 0.1.0
+url: https://github.com/Jay4242/llm_performer_tag/
+ui:
+  javascript:
+    - llm_performer_tag.js
+  assets:
+    /results: results
+settings:
+  llmBaseUrl:
+    displayName: LLM Base URL
+    description: "HTTP base URL for the OpenAI-compatible endpoint (e.g. http://localhost:11434/v1)."
+    type: STRING
+  llmModel:
+    displayName: LLM Model
+    description: "Model name to use for tagging."
+    type: STRING
+  llmTemp:
+    displayName: Temperature
+    description: "Sampling temperature."
+    type: NUMBER
+  llmMaxTokens:
+    displayName: Max tokens
+    description: "Maximum tokens to request (-1 for backend default)."
+    type: NUMBER
+  llmTimeout:
+    displayName: LLM Timeout (seconds)
+    description: "Timeout for contacting the LLM server."
+    type: NUMBER
+  enableThinking:
+    displayName: Enable Thinking/Reasoning
+    description: "When disabled, sends chat_template_kwargs to turn off internal chain-of-thought reasoning, which can speed up responses on models that support it."
+    type: BOOLEAN
+  includePerformerDescriptions:
+    displayName: Include Performer Details
+    description: Include performer details (disambiguation, gender, aliases) alongside performer names in the LLM prompt.
+    type: BOOLEAN
+  includePerformerImages:
+    displayName: Include Performer Images
+    description: Send each performer's custom image to help the LLM visually identify performers. Only performers with a manually-set image are included; generated default placeholders are skipped.
+    type: BOOLEAN
+  maxPerformerImages:
+    displayName: Max Performer Images
+    description: "Maximum number of performer images to send to the LLM. 0 or -1 = unlimited. Only applies when Include Performer Images is enabled."
+    type: NUMBER
+  sceneThreshold:
+    displayName: Scene Detection Threshold
+    description: "Sensitivity of ffmpeg scene detection (0.0-1.0). Higher = fewer scene changes detected. Applies to scenes only."
+    type: NUMBER
+  maxFrames:
+    displayName: Max Frames
+    description: "Maximum number of frames to extract and send to the LLM. Applies to scenes only."
+    type: NUMBER
+  frameWidth:
+    displayName: Frame Width
+    description: "Resize extracted frames to this width in pixels (-1 to keep original size). Applies to scenes only."
+    type: NUMBER
+  zzdebugTracing:
+    displayName: Debug Tracing
+    description: Enable additional debug logs.
+    type: BOOLEAN
+  saveDebugLog:
+    displayName: Save Debug Log
+    description: "Save the sanitized LLM request payload (images stripped) to the results directory for debugging. Each run overwrites the previous log."
+    type: BOOLEAN
+exec:
+  - python
+  - "{pluginDir}/llm_performer_tag.py"
+interface: raw
+tasks:
+  - name: Tag image performers (LLM)
+    description: Identify performers in the current image using a vision LLM
+    defaultArgs:
+      mode: tag_image_performers
+  - name: Tag scene performers (LLM)
+    description: Identify performers in the current scene using a vision LLM
+    defaultArgs:
+      mode: tag_scene_performers
